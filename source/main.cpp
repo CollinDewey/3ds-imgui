@@ -139,8 +139,8 @@ int main (int argc_, char *argv_[]) {
 		ImGui::SetNextWindowPos(ImVec2(0, 0), ImGuiCond_FirstUseEver);
 
 			ImGui::Begin("Demo Window 1");
-   			ImGui::Button("Hello!");
-   			ImGui::End();
+			ImGui::Button("Hello!");
+			ImGui::End();
 
 		// bottom screen
 		ImGui::SetNextWindowSize(ImVec2(width * 0.8f, height * 0.5f));
