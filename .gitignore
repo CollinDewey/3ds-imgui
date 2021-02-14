@@ -30,3 +30,13 @@
 *.exe
 *.out
 *.app
+
+# 3DS
+*.3dsx
+*.3dsx.xz
+*.cia
+*.cia.xz
+*.elf
+*.smdh
+3ds/build
+3ds/romfs/*.t3x
