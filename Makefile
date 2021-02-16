@@ -67,9 +67,6 @@ CFLAGS   := -g -Wall $(OPTIMIZE) -mword-relocations \
             $(ARCH) $(DEFINES) $(CLASSIC)
 
 CFLAGS   +=  $(INCLUDE) -DARM11 -D_3DS \
-            -DSTATUS_STRING="\"ftpd v$(VERSION)\"" \
-            -DIMGUI_DISABLE_INCLUDE_IMCONFIG_H=1 \
-            -DNO_IPV6 -DFTPDCONFIG="\"/config/ftpd/ftpd.cfg\"" \
             -DANTI_ALIAS=1
 
 CXXFLAGS := $(CFLAGS) -fno-rtti -fno-exceptions -std=gnu++17
