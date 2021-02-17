@@ -20,7 +20,6 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#ifndef CLASSIC
 #include "imgui_citro3d.h"
 
 #include <citro3d.h>
@@ -724,4 +723,3 @@ void imgui::citro3d::render (C3D_RenderTarget *const top_, C3D_RenderTarget *con
 		}
 	}
 }
-#endif

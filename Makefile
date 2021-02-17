@@ -38,8 +38,8 @@ BUILD     := 3ds/build
 SOURCES   += source/imgui
 SOURCES  := source source/3ds source/imgui
 DATA     := data
-GRAPHICS  := 3ds/gfx
-ROMFS     := 3ds/romfs
+#GRAPHICS  := 3ds/gfx
+#ROMFS     := 3ds/romfs
 GFXBUILD  := $(ROMFS)
 RSF_FILE  := meta/cia.rsf
 
@@ -49,7 +49,7 @@ VERSION_MINOR := 0
 VERSION_MICRO := 0
 VERSION := $(VERSION_MAJOR).$(VERSION_MINOR).$(VERSION_MICRO)
 
-APP_DESCRIPTION := v$(VERSION)
+APP_DESCRIPTION := $(APP_TITLE) v$(VERSION)
 APP_AUTHOR      := Sample Author
 
 ICON      := meta/icon.png

@@ -19,9 +19,7 @@
 
 #include <cstdio>
 #include <cstdlib>
-
 #include <citro3d.h>
-#include <tex3ds.h>
 
 #if ANTI_ALIAS
 /// \brief Display transfer scaling
@@ -55,11 +53,6 @@ constexpr auto DISPLAY_TRANSFER_FLAGS =
 	GX_TRANSFER_IN_FORMAT (GX_TRANSFER_FMT_RGBA8) | GX_TRANSFER_OUT_FORMAT (GX_TRANSFER_FMT_RGB8) |
 	GX_TRANSFER_SCALING (TRANSFER_SCALING);
 
-/// \brief Texture atlas
-C3D_Tex s_gfxTexture;
-/// \brief Texture atlas metadata
-Tex3DS_Texture s_gfxT3x;
-
 /// \brief Clear color
 constexpr auto CLEAR_COLOR = 0x808080FF;
 
@@ -72,7 +65,6 @@ int main (int argc_, char *argv_[]) {
 	osSetSpeedupEnable (true);
 
 	// init services
-	romfsInit();
 	gfxInitDefault();
 	gfxSet3D(false);
 
@@ -92,33 +84,17 @@ int main (int argc_, char *argv_[]) {
 
 	imgui::citro3d::init();
 
-	// load texture atlas
-	FILE *file = fopen("test.bin","rb");
-	if (!fopen("romfs:/gfx.t3x", "r"))
-		svcBreak(USERBREAK_PANIC);
-
-	s_gfxT3x = Tex3DS_TextureImportStdio (file, &s_gfxTexture, nullptr, true);
-	if (!s_gfxT3x)
-		svcBreak(USERBREAK_PANIC);
-
-	C3D_TexSetFilter (&s_gfxTexture, GPU_LINEAR, GPU_LINEAR);
-
 	auto &io    = ImGui::GetIO();
 	auto &style = ImGui::GetStyle();
 
 	// disable imgui.ini file
 	io.IniFilename = nullptr;
 
-	// citro3d logo doesn't quite show with the default transparency
-	style.Colors[ImGuiCol_WindowBg].w = 0.8f;
-	style.ScaleAllSizes(0.5f);
-
-	// turn off window rounding
-	style.WindowRounding = 0.0f;
-
 	// setup display metrics
 	io.DisplaySize = ImVec2(SCREEN_WIDTH, SCREEN_HEIGHT);
 	io.DisplayFramebufferScale = ImVec2(FB_SCALE, FB_SCALE);
+    auto const width = io.DisplaySize.x;
+    auto const height = io.DisplaySize.y;
 
 	while (aptMainLoop()) {
 
@@ -131,11 +107,8 @@ int main (int argc_, char *argv_[]) {
 		imgui::ctru::newFrame();
 		ImGui::NewFrame();
 
-		auto const width = io.DisplaySize.x;
-		auto const height = io.DisplaySize.y;
-
 		// top screen
-		ImGui::SetNextWindowSize(ImVec2(width, height * 0.5f), ImGuiCond_FirstUseEver);
+		ImGui::SetNextWindowSize(ImVec2(width, height * 0.5f));
 		ImGui::SetNextWindowPos(ImVec2(0, 0), ImGuiCond_FirstUseEver);
 
 			ImGui::Begin("Demo Window 1");
@@ -146,7 +119,7 @@ int main (int argc_, char *argv_[]) {
 		ImGui::SetNextWindowSize(ImVec2(width * 0.8f, height * 0.5f));
 		ImGui::SetNextWindowPos(ImVec2(width * 0.1f, height * 0.5f), ImGuiCond_FirstUseEver);
 
-			ImGui::Begin("Demo Window 2", nullptr, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_MenuBar);
+			ImGui::Begin("Demo Window 2");
 			ImGui::Button("Hello!");
 			ImGui::End();
 
@@ -166,17 +139,12 @@ int main (int argc_, char *argv_[]) {
 	// clean up resources
 	imgui::citro3d::exit();
 
-	// free graphics
-	Tex3DS_TextureFree(s_gfxT3x);
-	C3D_TexDelete(&s_gfxTexture);
-
 	// free render targets
 	C3D_RenderTargetDelete(s_bottom);
 	C3D_RenderTargetDelete(s_top);
 
-	// deinitialize citro3d
+	// deinitialize
 	C3D_Fini();
-
 	gfxExit();
 	acExit();
 
