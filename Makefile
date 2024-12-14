@@ -66,10 +66,10 @@ CFLAGS   := -g -Wall $(OPTIMIZE) -mword-relocations \
             -fomit-frame-pointer -ffunction-sections -fdata-sections \
             $(ARCH) $(DEFINES) $(CLASSIC)
 
-CFLAGS   +=  $(INCLUDE) -DARM11 -D_3DS \
+CFLAGS   +=  $(INCLUDE) -D__3DS__ \
             -DANTI_ALIAS=1
 
-CXXFLAGS := $(CFLAGS) -fno-rtti -fno-exceptions -std=gnu++17
+CXXFLAGS := $(CFLAGS) -fno-rtti -fno-exceptions -std=gnu++20
 
 ASFLAGS  := -g $(ARCH)
 LDFLAGS   = -specs=3dsx.specs -g $(ARCH) -Wl,-Map,$(notdir $*.map) $(OPTIMIZE)

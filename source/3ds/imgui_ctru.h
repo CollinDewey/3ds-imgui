@@ -23,7 +23,6 @@
 #pragma once
 
 #include <3ds.h>
-#include <chrono>
 
 namespace imgui
 {
@@ -34,27 +33,5 @@ bool init ();
 
 /// \brief Prepare 3ds for a new frame
 void newFrame ();
-
-struct steady_clock
-{
-	/// \brief Type representing number of ticks
-	using rep = std::uint64_t;
-
-	/// \brief Type representing ratio of clock period in seconds
-	using period = std::ratio<1, SYSCLOCK_ARM11>;
-
-	/// \brief Duration type
-	using duration = std::chrono::duration<rep, period>;
-
-	/// \brief Timestamp type
-	using time_point = std::chrono::time_point<steady_clock>;
-
-	/// \brief Whether clock is steady
-	constexpr static bool is_steady = true;
-
-	/// \brief Current timestamp
-	static time_point now () noexcept;
-};
-
 }
 }

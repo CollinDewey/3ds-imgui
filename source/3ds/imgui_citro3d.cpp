@@ -170,7 +170,7 @@ void imgui::citro3d::init ()
 	shaderProgramSetVsh (&s_program, &s_vsh->DVLE[0]);
 
 	// get projection matrix uniform location
-	s_projLocation = shaderInstanceGetUniformLocation (s_program.vertexShader, "proj");
+	s_projLocation = shaderInstanceGetUniformLocation (s_program.vertexShader, "projection");
 
 	// allocate vertex data buffer
 	s_vtxSize = 65536;
@@ -342,7 +342,7 @@ void imgui::citro3d::init ()
 	// add config and font to atlas
 	atlas->ConfigData.push_back (config);
 	atlas->Fonts.push_back (imFont);
-	atlas->SetTexID (s_fontTextures.data ());
+	atlas->SetTexID(reinterpret_cast<ImTextureID>(s_fontTextures.data()));
 
 	// initialize font
 	imFont->FallbackAdvanceX = fontInfo->defaultWidth.charWidth;
@@ -391,6 +391,9 @@ void imgui::citro3d::init ()
 
 	// build lookup table
 	imFont->BuildLookupTable ();
+
+	// tell imgui it is ready
+	atlas->TexReady = true;
 }
 
 void imgui::citro3d::exit ()
@@ -607,7 +610,7 @@ void imgui::citro3d::render (C3D_RenderTarget *const top_, C3D_RenderTarget *con
 					}
 
 					// check if we need to update texture binding
-					auto tex = static_cast<C3D_Tex *> (cmd.TextureId);
+					auto tex = reinterpret_cast<C3D_Tex *>(cmd.TextureId);
 					if (tex == s_fontTextures.data ())
 					{
 						assert (cmd.ElemCount % 3 == 0);
@@ -697,7 +700,7 @@ void imgui::citro3d::render (C3D_RenderTarget *const top_, C3D_RenderTarget *con
 						if (tex != s_boundTexture)
 						{
 							// bind new texture
-							C3D_TexBind (0, tex);
+							C3D_TexBind (0, reinterpret_cast<C3D_Tex *>(tex));
 
 							// update texture environment for drawing images
 							auto const env = C3D_GetTexEnv (0);

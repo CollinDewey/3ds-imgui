@@ -30,6 +30,7 @@
 #include <functional>
 #include <string>
 #include <tuple>
+#include <cstdint>
 using namespace std::chrono_literals;
 
 namespace
@@ -38,19 +39,19 @@ namespace
 std::string s_clipboard;
 
 /// \brief Get clipboard text callback
-/// \param userData_ User data
-char const *getClipboardText (void *const userData_)
+/// \param context_ ImGui context
+char const *getClipboardText (ImGuiContext *const context_)
 {
-	(void)userData_;
+	(void)context_;
 	return s_clipboard.c_str ();
 }
 
 /// \brief Set clipboard text callback
-/// \param userData_ User data
+/// \param context_ ImGui context
 /// \param text_ Clipboard text
-void setClipboardText (void *const userData_, char const *const text_)
+void setClipboardText (ImGuiContext *const context_, char const *const text_)
 {
-	(void)userData_;
+	(void)context_;
 	s_clipboard = text_;
 }
 
@@ -62,7 +63,7 @@ void updateTouch (ImGuiIO &io_)
 	if (hidKeysUp () & KEY_TOUCH)
 	{
 		// keep mouse position for one frame for release event
-		io_.MouseDown[0] = false;
+		io_.AddMouseButtonEvent (0, false);
 		return;
 	}
 
@@ -70,8 +71,8 @@ void updateTouch (ImGuiIO &io_)
 	if (!(hidKeysHeld () & KEY_TOUCH))
 	{
 		// set mouse cursor off-screen
-		io_.MousePos     = ImVec2 (-10.0f, -10.0f);
-		io_.MouseDown[0] = false;
+		io_.AddMousePosEvent (-10.0f, -10.0f);
+		io_.AddMouseButtonEvent (0, false);
 		return;
 	}
 
@@ -80,59 +81,55 @@ void updateTouch (ImGuiIO &io_)
 	hidTouchRead (&pos);
 
 	// transform to bottom-screen space
-	io_.MousePos     = ImVec2 (pos.px + 40.0f, pos.py + 240.0f);
-	io_.MouseDown[0] = true;
+	io_.AddMousePosEvent (pos.px + 40.0f, pos.py + 240.0f);
+	io_.AddMouseButtonEvent (0, true);
 }
 
 /// \brief Update gamepad inputs
 /// \param io_ ImGui IO
 void updateGamepads (ImGuiIO &io_)
 {
-	// clear navigation inputs
-	std::memset (io_.NavInputs, 0, sizeof (io_.NavInputs));
-
 	auto const buttonMapping = {
-	    std::make_pair (KEY_A, ImGuiNavInput_Activate),
-	    std::make_pair (KEY_B, ImGuiNavInput_Cancel),
-	    std::make_pair (KEY_X, ImGuiNavInput_Input),
-	    std::make_pair (KEY_Y, ImGuiNavInput_Menu),
-	    std::make_pair (KEY_L, ImGuiNavInput_FocusPrev),
-	    std::make_pair (KEY_L, ImGuiNavInput_TweakSlow),
-	    std::make_pair (KEY_ZL, ImGuiNavInput_FocusPrev),
-	    std::make_pair (KEY_ZL, ImGuiNavInput_TweakSlow),
-	    std::make_pair (KEY_R, ImGuiNavInput_FocusNext),
-	    std::make_pair (KEY_R, ImGuiNavInput_TweakFast),
-	    std::make_pair (KEY_ZR, ImGuiNavInput_FocusNext),
-	    std::make_pair (KEY_ZR, ImGuiNavInput_TweakFast),
-	    std::make_pair (KEY_DUP, ImGuiNavInput_DpadUp),
-	    std::make_pair (KEY_DRIGHT, ImGuiNavInput_DpadRight),
-	    std::make_pair (KEY_DDOWN, ImGuiNavInput_DpadDown),
-	    std::make_pair (KEY_DLEFT, ImGuiNavInput_DpadLeft),
+	    std::make_pair (KEY_A, ImGuiKey_GamepadFaceDown),  // A and B are swapped,
+	    std::make_pair (KEY_B, ImGuiKey_GamepadFaceRight), // this is more intuitive
+	    std::make_pair (KEY_X, ImGuiKey_GamepadFaceUp),
+	    std::make_pair (KEY_Y, ImGuiKey_GamepadFaceLeft),
+	    std::make_pair (KEY_L, ImGuiKey_GamepadL1),
+	    std::make_pair (KEY_ZL, ImGuiKey_GamepadL1),
+	    std::make_pair (KEY_ZR, ImGuiKey_GamepadR1),
+	    std::make_pair (KEY_R, ImGuiKey_GamepadR1),
+	    std::make_pair (KEY_DUP, ImGuiKey_GamepadDpadUp),
+	    std::make_pair (KEY_DRIGHT, ImGuiKey_GamepadDpadRight),
+	    std::make_pair (KEY_DDOWN, ImGuiKey_GamepadDpadDown),
+	    std::make_pair (KEY_DLEFT, ImGuiKey_GamepadDpadLeft),
 	};
 
 	// read buttons from 3DS
-	auto const keys = hidKeysHeld ();
+	auto const keys_up = hidKeysUp ();
+	auto const keys_down = hidKeysDown ();
 	for (auto const &[in, out] : buttonMapping)
 	{
-		if (keys & in)
-			io_.NavInputs[out] = 1.0f;
+		if (keys_up & in)
+			io_.AddKeyEvent(out, false);
+		if (keys_down & in)
+			io_.AddKeyEvent(out, true);
 	}
 
 	// update joystick
 	circlePosition cpad;
 	auto const analogMapping = {
-	    std::make_tuple (std::ref (cpad.dx), ImGuiNavInput_LStickLeft, -0.3f, -0.9f),
-	    std::make_tuple (std::ref (cpad.dx), ImGuiNavInput_LStickRight, +0.3f, +0.9f),
-	    std::make_tuple (std::ref (cpad.dy), ImGuiNavInput_LStickUp, +0.3f, +0.9f),
-	    std::make_tuple (std::ref (cpad.dy), ImGuiNavInput_LStickDown, -0.3f, -0.9f),
+	    std::make_tuple (std::ref (cpad.dx), ImGuiKey_GamepadLStickLeft, -0.3f, -0.9f),
+	    std::make_tuple (std::ref (cpad.dx), ImGuiKey_GamepadLStickRight, +0.3f, +0.9f),
+	    std::make_tuple (std::ref (cpad.dy), ImGuiKey_GamepadLStickUp, +0.3f, +0.9f),
+	    std::make_tuple (std::ref (cpad.dy), ImGuiKey_GamepadLStickDown, -0.3f, -0.9f),
 	};
 
 	// read left joystick from circle pad
 	hidCircleRead (&cpad);
 	for (auto const &[in, out, min, max] : analogMapping)
 	{
-		auto const value   = in / static_cast<float> (0x9C);
-		io_.NavInputs[out] = std::clamp ((value - min) / (max - min), 0.0f, 1.0f);
+		auto const value = std::clamp ((in / 156.0f - min) / (max - min), 0.0f, 1.0f);
+		io_.AddKeyAnalogEvent(out, value > 0.1f, value);
 	}
 }
 
@@ -161,9 +158,9 @@ void updateKeyboard (ImGuiIO &io_)
 		swkbdSetButton (&kbd, SWKBD_BUTTON_LEFT, "Cancel", false);
 		swkbdSetButton (&kbd, SWKBD_BUTTON_RIGHT, "OK", true);
 		swkbdSetInitialText (
-		    &kbd, std::string (textState.InitialTextA.Data, textState.InitialTextA.Size).c_str ());
+		    &kbd, std::string (textState.TextToRevertTo.Data, textState.TextToRevertTo.Size).c_str ());
 
-		if (textState.UserFlags & ImGuiInputTextFlags_Password)
+		if (textState.Flags & ImGuiInputTextFlags_Password)
 			swkbdSetPasswordMode (&kbd, SWKBD_PASSWORD_HIDE_DELAY);
 
 		char buffer[32]   = {0};
@@ -188,6 +185,33 @@ void updateKeyboard (ImGuiIO &io_)
 }
 }
 
+struct n3ds_clock
+{
+	/// \brief Type representing number of ticks
+	using rep = uint64_t;
+
+	/// \brief Type representing ratio of clock period in seconds
+	using period = std::ratio<1, SYSCLOCK_ARM11>;
+
+	/// \brief Duration type
+	using duration = std::chrono::duration<rep, period>;
+
+	/// \brief Timestamp type
+	using time_point = std::chrono::time_point<n3ds_clock>;
+
+	/// \brief Whether clock is steady
+	constexpr static bool is_steady = true;
+
+	/// \brief Current timestamp
+	static time_point now () noexcept;
+};
+
+inline n3ds_clock::time_point n3ds_clock::now () noexcept
+{
+	return time_point (duration (svcGetSystemTick ()));
+}
+
+
 bool imgui::ctru::init ()
 {
 	auto &io = ImGui::GetIO ();
@@ -203,10 +227,12 @@ bool imgui::ctru::init ()
 	// disable mouse cursor
 	io.MouseDrawCursor = false;
 
+	auto &platformIO = ImGui::GetPlatformIO ();
+	
 	// clipboard callbacks
-	io.SetClipboardTextFn = setClipboardText;
-	io.GetClipboardTextFn = getClipboardText;
-	io.ClipboardUserData  = nullptr;
+	platformIO.Platform_SetClipboardTextFn = &setClipboardText;
+	platformIO.Platform_GetClipboardTextFn = &getClipboardText;
+	platformIO.Platform_ClipboardUserData  = nullptr;
 
 	return true;
 }
@@ -221,9 +247,9 @@ void imgui::ctru::newFrame ()
 	           "to renderer _NewFrame() function?");
 
 	// time step
-	static auto const start = steady_clock::now ();
+	static auto const start = n3ds_clock::now ();
 	static auto prev        = start;
-	auto const now          = steady_clock::now ();
+	auto const now          = n3ds_clock::now ();
 
 	io.DeltaTime = std::chrono::duration<float> (now - prev).count ();
 	prev         = now;
@@ -231,10 +257,4 @@ void imgui::ctru::newFrame ()
 	updateTouch (io);
 	updateGamepads (io);
 	updateKeyboard (io);
-}
-
-
-imgui::ctru::steady_clock::time_point imgui::ctru::steady_clock::now () noexcept
-{
-	return time_point (duration (svcGetSystemTick ()));
 }

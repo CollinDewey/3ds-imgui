@@ -17,9 +17,8 @@
 .alias inclr v2
 
 .proc main
-	; r0 = (inpos.x, inpos.y, inpos.z, 1.0)
-	mov r0.xyz, inpos
-	; mov r0.w, ones
+	; r0 = inpos
+	mov r0, inpos
 
     ; outpos = projection * r0
 	dp4 outpos.x, projection[0], r0
