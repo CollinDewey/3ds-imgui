@@ -1,18 +1,3 @@
-// Copyright (C) 2020 Michael Theall
-//
-// This program is free software: you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-//
-// This program is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
-//
-// You should have received a copy of the GNU General Public License
-// along with this program.  If not, see <https://www.gnu.org/licenses/>.
-
 #include "3ds/imgui_citro3d.h"
 #include "3ds/imgui_ctru.h"
 #include "imgui/imgui.h"
@@ -53,10 +38,16 @@ constexpr auto DISPLAY_TRANSFER_FLAGS =
 	GX_TRANSFER_IN_FORMAT (GX_TRANSFER_FMT_RGBA8) | GX_TRANSFER_OUT_FORMAT (GX_TRANSFER_FMT_RGB8) |
 	GX_TRANSFER_SCALING (TRANSFER_SCALING);
 
+/// \brief Window flags
+constexpr auto WINDOW_FLAGS = ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse;
+
 /// \brief Clear color
 constexpr auto CLEAR_COLOR = 0x808080FF;
 
-int main (int argc_, char *argv_[]) {
+void top_window();
+void bottom_window();
+
+int main(int argc_, char *argv_[]) {
 
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
@@ -85,7 +76,6 @@ int main (int argc_, char *argv_[]) {
 	imgui::citro3d::init();
 
 	auto &io    = ImGui::GetIO();
-	auto &style = ImGui::GetStyle();
 
 	// disable imgui.ini file
 	io.IniFilename = nullptr;
@@ -93,8 +83,6 @@ int main (int argc_, char *argv_[]) {
 	// setup display metrics
 	io.DisplaySize = ImVec2(SCREEN_WIDTH, SCREEN_HEIGHT);
 	io.DisplayFramebufferScale = ImVec2(FB_SCALE, FB_SCALE);
-    auto const width = io.DisplaySize.x;
-    auto const height = io.DisplaySize.y;
 
 	while (aptMainLoop()) {
 
@@ -107,21 +95,8 @@ int main (int argc_, char *argv_[]) {
 		imgui::ctru::newFrame();
 		ImGui::NewFrame();
 
-		// top screen
-		ImGui::SetNextWindowSize(ImVec2(width, height * 0.5f));
-		ImGui::SetNextWindowPos(ImVec2(0, 0), ImGuiCond_FirstUseEver);
-
-			ImGui::Begin("Demo Window 1");
-			ImGui::Button("Hello!");
-			ImGui::End();
-
-		// bottom screen
-		ImGui::SetNextWindowSize(ImVec2(width * 0.8f, height * 0.5f));
-		ImGui::SetNextWindowPos(ImVec2(width * 0.1f, height * 0.5f), ImGuiCond_FirstUseEver);
-
-			ImGui::Begin("Demo Window 2");
-			ImGui::Button("Hello!");
-			ImGui::End();
+		top_window();
+		bottom_window();
 
 		// render frame
 		ImGui::Render();
@@ -149,4 +124,34 @@ int main (int argc_, char *argv_[]) {
 	acExit();
 
 	ImGui::DestroyContext();
+}
+
+void top_window() {
+	ImGui::SetNextWindowSize(ImVec2(SCREEN_WIDTH, SCREEN_HEIGHT * 0.5f));
+	ImGui::SetNextWindowPos(ImVec2(0, 0), ImGuiCond_FirstUseEver);
+
+	if (!ImGui::Begin("Demo Top Screen", NULL, WINDOW_FLAGS)) {
+   	    ImGui::End();
+   	    return;
+   	}
+
+	ImGui::Text("Hello!");
+
+	ImGui::End();
+	return;
+}
+
+void bottom_window() {
+	ImGui::SetNextWindowSize(ImVec2(SCREEN_WIDTH * 0.8f, SCREEN_HEIGHT * 0.5f));
+	ImGui::SetNextWindowPos(ImVec2(SCREEN_WIDTH * 0.1f, SCREEN_HEIGHT * 0.5f), ImGuiCond_FirstUseEver);
+
+	if (!ImGui::Begin("Demo Bottom Screen", NULL, WINDOW_FLAGS)) {
+   	    ImGui::End();
+   	    return;
+   	}
+
+	ImGui::Button("Hello!");
+
+	ImGui::End();
+	return;
 }
