@@ -59,30 +59,26 @@ void setClipboardText (ImGuiContext *const context_, char const *const text_)
 /// \param io_ ImGui IO
 void updateTouch (ImGuiIO &io_)
 {
-	// check if touchpad was released
-	if (hidKeysUp () & KEY_TOUCH)
+	if ((hidKeysHeld () | hidKeysDown()) & KEY_TOUCH) // touch pressed
 	{
-		// keep mouse position for one frame for release event
-		io_.AddMouseButtonEvent (0, false);
-		return;
-	}
+		// read touch position
+		touchPosition pos;
+		hidTouchRead (&pos);
 
-	// check if touchpad is touched
-	if (!(hidKeysHeld () & KEY_TOUCH))
+		// transform to bottom-screen space
+		io_.AddMouseSourceEvent(ImGuiMouseSource_TouchScreen);
+		io_.AddMousePosEvent (pos.px + 40.0f, pos.py + 240.0f);
+		io_.AddMouseButtonEvent (0, true);
+	}
+	else if (hidKeysUp () & KEY_TOUCH) // touch released
 	{
-		// set mouse cursor off-screen
+		io_.AddMouseButtonEvent (0, false);
+	}
+	else // no touch, move offscreen
+	{
 		io_.AddMousePosEvent (-10.0f, -10.0f);
-		io_.AddMouseButtonEvent (0, false);
-		return;
 	}
 
-	// read touch position
-	touchPosition pos;
-	hidTouchRead (&pos);
-
-	// transform to bottom-screen space
-	io_.AddMousePosEvent (pos.px + 40.0f, pos.py + 240.0f);
-	io_.AddMouseButtonEvent (0, true);
 }
 
 /// \brief Update gamepad inputs
