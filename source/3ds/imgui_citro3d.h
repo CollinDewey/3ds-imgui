@@ -24,16 +24,16 @@
 
 #include <citro3d.h>
 
-namespace imgui
+namespace ImGui
 {
-namespace citro3d
+namespace Citro3D
 {
 /// \brief Initialize citro3d
-void init ();
+void Init ();
 /// \brief Deinitialize citro3d
-void exit ();
+void Exit ();
 
 /// \brief Render ImGui draw list
-void render (C3D_RenderTarget *top_, C3D_RenderTarget *bottom_);
+void Render (C3D_RenderTarget *top_, C3D_RenderTarget *bottom_);
 }
 }

@@ -24,14 +24,14 @@
 
 #include <3ds.h>
 
-namespace imgui
+namespace ImGui
 {
-namespace ctru
+namespace Ctru
 {
 /// \brief Initialize 3ds platform
-bool init ();
+bool Init ();
 
 /// \brief Prepare 3ds for a new frame
-void newFrame ();
+void NewFrame ();
 }
 }

@@ -70,10 +70,10 @@ int main(int argc_, char *argv_[]) {
 	s_bottom = C3D_RenderTargetCreate(FB_HEIGHT * 0.5f, FB_WIDTH * 0.8f, GPU_RB_RGBA8, GPU_RB_DEPTH24_STENCIL8);
 	C3D_RenderTargetSetOutput(s_bottom, GFX_BOTTOM, GFX_LEFT, DISPLAY_TRANSFER_FLAGS);
 
-	if (!imgui::ctru::init())
+	if (!ImGui::Ctru::Init())
 		return false;
 
-	imgui::citro3d::init();
+	ImGui::Citro3D::Init();
 
 	auto &io    = ImGui::GetIO();
 
@@ -92,7 +92,7 @@ int main(int argc_, char *argv_[]) {
 		if (kDown & KEY_START)
 			return false;
 
-		imgui::ctru::newFrame();
+		ImGui::Ctru::NewFrame();
 		ImGui::NewFrame();
 
 		top_window();
@@ -106,13 +106,13 @@ int main(int argc_, char *argv_[]) {
 		C3D_RenderTargetClear(s_top, C3D_CLEAR_ALL, CLEAR_COLOR, 0);
 		C3D_RenderTargetClear(s_bottom, C3D_CLEAR_ALL, CLEAR_COLOR, 0);
 
-		imgui::citro3d::render(s_top, s_bottom);
+		ImGui::Citro3D::Render(s_top, s_bottom);
 
 		C3D_FrameEnd(0);
 	}
 
 	// clean up resources
-	imgui::citro3d::exit();
+	ImGui::Citro3D::Exit();
 
 	// free render targets
 	C3D_RenderTargetDelete(s_bottom);

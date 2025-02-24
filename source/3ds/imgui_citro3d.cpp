@@ -152,7 +152,7 @@ void setupRenderState (gfxScreen_t const screen_)
 }
 }
 
-void imgui::citro3d::init ()
+void ImGui::Citro3D::Init ()
 {
 	// setup back-end capabilities flags
 	auto &io = ImGui::GetIO ();
@@ -396,7 +396,7 @@ void imgui::citro3d::init ()
 	atlas->TexReady = true;
 }
 
-void imgui::citro3d::exit ()
+void ImGui::Citro3D::Exit ()
 {
 	// free vertex/index data buffers
 	linearFree (s_idxData);
@@ -411,7 +411,7 @@ void imgui::citro3d::exit ()
 	DVLB_Free (s_vsh);
 }
 
-void imgui::citro3d::render (C3D_RenderTarget *const top_, C3D_RenderTarget *const bottom_)
+void ImGui::Citro3D::Render (C3D_RenderTarget *const top_, C3D_RenderTarget *const bottom_)
 {
 	// get draw data
 	auto const drawData = ImGui::GetDrawData ();

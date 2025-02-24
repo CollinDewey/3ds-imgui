@@ -208,7 +208,7 @@ inline n3ds_clock::time_point n3ds_clock::now () noexcept
 }
 
 
-bool imgui::ctru::init ()
+bool ImGui::Ctru::Init ()
 {
 	auto &io = ImGui::GetIO ();
 
@@ -233,7 +233,7 @@ bool imgui::ctru::init ()
 	return true;
 }
 
-void imgui::ctru::newFrame ()
+void ImGui::Ctru::NewFrame ()
 {
 	auto &io = ImGui::GetIO ();
 
