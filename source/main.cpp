@@ -1,5 +1,5 @@
-#include "3ds/imgui_citro3d.h"
-#include "3ds/imgui_ctru.h"
+#include "3ds/imgui_impl_citro3d.h"
+#include "3ds/imgui_impl_ctru.h"
 #include "imgui/imgui.h"
 
 #include <cstdio>

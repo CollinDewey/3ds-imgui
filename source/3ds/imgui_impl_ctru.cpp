@@ -20,7 +20,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#include "imgui_ctru.h"
+#include "imgui_impl_ctru.h"
 
 #include "../imgui/imgui.h"
 #include "../imgui/imgui_internal.h"

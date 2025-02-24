@@ -20,7 +20,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#include "imgui_citro3d.h"
+#include "imgui_impl_citro3d.h"
 
 #include <citro3d.h>
 
